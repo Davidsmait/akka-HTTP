@@ -23,5 +23,8 @@ libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-http-spray-json" % "10.1.7",
   "ch.qos.logback" % "logback-classic" % "1.2.11",
   "com.typesafe.akka" %% "akka-actor-testkit-typed" % akkaVersion % Test,
-  "org.scalatest" %% "scalatest" % "3.1.4" % Test
+  "org.scalatest" %% "scalatest" % "3.1.4" % Test,
+  "javax.inject" % "javax.inject" % "1",
+  "net.codingwell" %% "scala-guice" % "5.1.1",
+  "org.scalamock" %% "scalamock" % "5.2.0" % Test,
 )
