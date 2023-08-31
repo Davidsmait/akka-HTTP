@@ -1,16 +1,24 @@
 //#full-example
 package com.example.akka
 
+import akka.http.scaladsl.testkit.ScalatestRouteTest
 import org.scalamock.scalatest.MockFactory
-import org.scalatest.{Exceptional, Failed, Outcome, Pending, Succeeded, freespec}
+import org.scalatest.{BeforeAndAfter, Exceptional, Failed, Outcome, Pending, Succeeded, color, freespec}
 import org.scalatest.freespec.AnyFreeSpec
+import org.scalatest.matchers.should.Matchers
 
 import java.io.File
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
+import akka.http.scaladsl.testkit.ScalatestRouteTest
+import akka.http.scaladsl.server._
+import Directives._
+import akka.http.scaladsl.model.StatusCodes
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
 //#definition
-class AkkaQuickstartSpec extends freespec.AnyFreeSpec with MockFactory {
+class AkkaQuickstartSpec extends freespec.AnyFreeSpec with MockFactory with BeforeAndAfter with Matchers with ScalatestRouteTest{
   override def withFixture(test: NoArgTest): Outcome = {
     super.withFixture(test) match {
       case exceptional: Exceptional =>
@@ -24,6 +32,8 @@ class AkkaQuickstartSpec extends freespec.AnyFreeSpec with MockFactory {
         Pending
     }
   }
+
+  after()
 
 
   "given" - {
@@ -197,6 +207,45 @@ class AkkaQuickstartSpec extends freespec.AnyFreeSpec with MockFactory {
     "with: trying implement a fixture" - {
       "then  use the fixture" in {
 
+      }
+    }
+
+    "with: route service" - {
+      val smallRoute =
+        get {
+          concat(
+            pathSingleSlash {
+              complete {
+                "Captain on the bridge!"
+              }
+            },
+            path("ping") {
+              complete("PONG!")
+            }
+          )
+        }
+      "then: return a greeting for GET requests to the root path" in {
+        Get() ~> smallRoute ~> check {
+          responseAs[String] shouldEqual "Captain on the bridge!"
+        }
+      }
+
+      "then: return a pong for /ping routes" in {
+        Get("/ping") ~> smallRoute ~> check {
+          responseAs[String] shouldEqual "PONG!"
+        }
+      }
+
+      "then: unhandled paths" in {
+        Get("/kermit") ~> smallRoute ~> check {
+          handled shouldBe false
+        }
+      }
+
+      "then: HTTP method not allowed" in {
+        Put() ~> Route.seal(smallRoute) ~> check {
+          status shouldEqual StatusCodes.MethodNotAllowed
+        }
       }
     }
 
