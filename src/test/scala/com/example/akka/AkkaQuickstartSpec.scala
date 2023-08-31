@@ -2,13 +2,29 @@
 package com.example.akka
 
 import org.scalamock.scalatest.MockFactory
+import org.scalatest.{Exceptional, Failed, Outcome, Pending, Succeeded, freespec}
 import org.scalatest.freespec.AnyFreeSpec
 
+import java.io.File
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
 //#definition
-class AkkaQuickstartSpec extends AnyFreeSpec with MockFactory {
+class AkkaQuickstartSpec extends freespec.AnyFreeSpec with MockFactory {
+  override def withFixture(test: NoArgTest): Outcome = {
+    super.withFixture(test) match {
+      case exceptional: Exceptional =>
+        info("exceptional")
+        exceptional
+      case Succeeded =>
+        info("Succeeded")
+        Succeeded
+      case Pending =>
+        info("Pending")
+        Pending
+    }
+  }
+
 
   "given" - {
     "when" - {
@@ -168,7 +184,25 @@ class AkkaQuickstartSpec extends AnyFreeSpec with MockFactory {
       }
     }
 
+    "with: overriding with fixture" -  {
+      "then: success" in {
+        assert(1+1 === 2)
+
+      }
+      "then: shouldfail" in {
+        assert(1+1 === 4)
+      }
+    }
+
+    "with: trying implement a fixture" - {
+      "then  use the fixture" in {
+
+      }
+    }
 
   }
+
+
+
 }
 //#full-example
