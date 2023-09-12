@@ -242,8 +242,23 @@ class AkkaQuickstartSpec extends freespec.AnyFreeSpec with MockFactory with Befo
         }
       }
 
+      //Route.seal()
+      // method applies the logic of the in-scope ExceptionHandler and RejectionHandler
+      // to all exceptions and rejections coming back from the route, and translates them
+      // to the respective HttpResponse.
+      //
+      //Note:
+      // that explicit call on the Route.seal method is needed in test code,
+      // but in your application code it is not necessary.
+      // As described in Sealing a Route, your application code only needs to bring implicit rejection and exception handlers in scope.
       "then: HTTP method not allowed" in {
         Put() ~> Route.seal(smallRoute) ~> check {
+          status shouldEqual StatusCodes.MethodNotAllowed
+        }
+      }
+
+      "then: Delete method not allowed xd" in {
+        Delete() ~> Route.seal(smallRoute) ~> check {
           status shouldEqual StatusCodes.MethodNotAllowed
         }
       }
